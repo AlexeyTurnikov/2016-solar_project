@@ -10,13 +10,21 @@ def calculate_force(body, space_objects):
     :param body: object, force on which we calculate
     :param space_objects: objects which affect the body
     """
-    body.fx = body.fy = 0
+    x_body = body.get_x()
+    y_body = body.get_y()
+    m_body = body.get_m()
+    fx = body.get_fx()
+    fy = body.get_fy()
+
     for obj in space_objects:
-        if body == obj:
-            continue  # body don't affect itself with gravity force
-        r = ((body.x - obj.x) ** 2 + (body.y - obj.y) ** 2) ** 0.5
-        body.fx += gravitational_constant * body.m * obj.m * (obj.x - body.x) / r ** 3
-        body.fy += gravitational_constant * body.m * obj.m * (obj.y - body.y) / r ** 3
+        x_obj = obj.get_x()
+        y_obj = obj.get_y()
+        m_obj = obj.get_m()
+        distance = ((x_body - x_obj) ** 2 + (y_body - y_obj) ** 2) ** 0.5
+        fx += gravitational_constant * m_body * m_obj * (x_obj - x_body) / distance ** 3
+        fy += gravitational_constant * m_body * m_obj * (y_obj - y_body) / distance ** 3
+        body.set_fx(fx)
+        body.set_fy(fy)
 
 
 def move_space_object(body, dt):
@@ -25,13 +33,23 @@ def move_space_object(body, dt):
     :param body: body to be moved
     :param dt: time step
     """
-    ax = body.Fx / body.m
-    body.vx += ax * dt
-    body.x += body.vx * dt
+    x = body.get_x()
+    y = body.get_y()
+    vx = body.get_vx()
+    vy = body.get_vy()
+
+    ax = body.get_fx() / body.get_m()
     ay = body.Fy / body.m
-    body.vy += ay * dt
-    body.y += body.vy * dt
-    # FIX ME: not sure if this works
+    vx += ax * dt
+    x += body.vx * dt
+    vy += ay * dt
+    y += vy * dt
+
+    body.set_x(x)
+    body.set_y(y)
+    body.set_vx(vx)
+    body.set_vy(vy)
+    # FIXME: not sure if this works
 
 
 def recalculate_space_objects_positions(space_objects, dt):
@@ -42,7 +60,7 @@ def recalculate_space_objects_positions(space_objects, dt):
     """
     for body in space_objects:
         calculate_force(body, space_objects)
-    for body in space_objects:
+        #    for body in space_objects:
         move_space_object(body, dt)
 
 
