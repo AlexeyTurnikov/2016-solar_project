@@ -38,9 +38,6 @@ class Star:
     color = "red"
     """Цвет звезды"""
 
-    image = None
-    """Изображение звезды"""
-
     def get_type(self):
         return self.type
 
@@ -71,9 +68,6 @@ class Star:
     def get_color(self):
         return self.color
 
-    def get_image(self):
-        return self.image
-
     def set_type(self, style: str):
         self.type = style
 
@@ -103,9 +97,6 @@ class Star:
 
     def set_color(self, color: str):
         self.color = color
-
-    def set_image(self, boolean: bool):
-        self.image = boolean
 
 
 class Planet:
@@ -144,9 +135,6 @@ class Planet:
     color = "green"
     """Цвет планеты"""
 
-    image = None
-    """Изображение планеты"""
-
     def get_type(self):
         return self.type
 
@@ -177,9 +165,6 @@ class Planet:
     def get_color(self):
         return self.color
 
-    def get_image(self):
-        return self.image
-
     def set_type(self, style: str):
         self.type = style
 
@@ -209,6 +194,3 @@ class Planet:
 
     def set_color(self, color: str):
         self.color = color
-
-    def set_image(self, boolean: bool):
-        self.image = boolean
