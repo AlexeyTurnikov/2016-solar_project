@@ -40,8 +40,8 @@ def parse_star_parameters(line, star):
     :param line: line with the star description
     :param star: the object from class Star which we give parameters
     """
-    r, color, m, x, y, vx, vy = int(line.split()[1]), line.split()[2], int(line.split()[3]), int(line.split()[4]), \
-                                int(line.split()[5]), int(line.split()[6]), int(line.split()[7])
+    r, color, m, x, y, vx, vy = line.split()[1], str(line.split()[2]), line.split()[3], line.split()[4], \
+                                line.split()[5], line.split()[6], line.split()[7]
     star.set_r(r)
     star.set_color(color)
     star.set_m(m)
@@ -62,8 +62,8 @@ def parse_planet_parameters(line, planet):
     :param line: line with the planet description
     :param planet: the object from class Planet which we give parameters
     """
-    r, color, m, x, y, vx, vy = int(line.split()[1]), line.split()[2], int(line.split()[3]), int(line.split()[4]), \
-                                int(line.split()[5]), int(line.split()[6]), int(line.split()[7])
+    r, color, m, x, y, vx, vy = line.split()[1], str(line.split()[2]), line.split()[3], line.split()[4], \
+                                line.split()[5], line.split()[6], line.split()[7]
     planet.set_r(r)
     planet.set_color(color)
     planet.set_m(m)
