@@ -104,7 +104,6 @@ class Star:
     def set_color(self, color: str):
         self.color = color
 
-
     def set_image(self, boolean: bool):
         self.image = boolean
 
@@ -210,7 +209,6 @@ class Planet:
 
     def set_color(self, color: str):
         self.color = color
-
 
     def set_image(self, boolean: bool):
         self.image = boolean
