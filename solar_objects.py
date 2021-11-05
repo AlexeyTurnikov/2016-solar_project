@@ -20,19 +20,19 @@ class Star:
     y = 0
     """Координата по оси **y**"""
 
-    Vx = 0
+    vx = 0
     """Скорость по оси **x**"""
 
-    Vy = 0
+    vy = 0
     """Скорость по оси **y**"""
 
-    Fx = 0
+    fx = 0
     """Сила по оси **x**"""
 
-    Fy = 0
+    fy = 0
     """Сила по оси **y**"""
 
-    R = 5
+    r = 5
     """Радиус звезды"""
 
     color = "red"
@@ -40,6 +40,73 @@ class Star:
 
     image = None
     """Изображение звезды"""
+
+    def get_type(self):
+        return self.type
+
+    def get_m(self):
+        return self.m
+
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
+
+    def get_vx(self):
+        return self.vx
+
+    def get_vy(self):
+        return self.vy
+
+    def get_fx(self):
+        return self.fx
+
+    def get_fy(self):
+        return self.fy
+
+    def get_r(self):
+        return self.r
+
+    def get_color(self):
+        return self.color
+
+    def get_image(self):
+        return self.image
+
+    def set_type(self, style: str):
+        self.type = style
+
+    def set_m(self, m):
+        self.m = m
+
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
+
+    def set_vx(self, vx):
+        self.vx = vx
+
+    def set_vy(self, vy):
+        self.vy = vy
+
+    def set_fx(self, fx):
+        self.fx = fx
+
+    def set_fy(self, fy):
+        self.fy = fy
+
+    def set_r(self, r):
+        self.r = r
+
+    def set_color(self, color: str):
+        self.color = color
+
+
+    def set_image(self, boolean: bool):
+        self.image = boolean
 
 
 class Planet:
@@ -60,19 +127,19 @@ class Planet:
     y = 0
     """Координата по оси **y**"""
 
-    Vx = 0
+    vx = 0
     """Скорость по оси **x**"""
 
-    Vy = 0
+    vy = 0
     """Скорость по оси **y**"""
 
-    Fx = 0
+    fx = 0
     """Сила по оси **x**"""
 
-    Fy = 0
+    fy = 0
     """Сила по оси **y**"""
 
-    R = 5
+    r = 5
     """Радиус планеты"""
 
     color = "green"
@@ -80,3 +147,70 @@ class Planet:
 
     image = None
     """Изображение планеты"""
+
+    def get_type(self):
+        return self.type
+
+    def get_m(self):
+        return self.m
+
+    def get_x(self):
+        return self.x
+
+    def get_y(self):
+        return self.y
+
+    def get_vx(self):
+        return self.vx
+
+    def get_vy(self):
+        return self.vy
+
+    def get_fx(self):
+        return self.fx
+
+    def get_fy(self):
+        return self.fy
+
+    def get_r(self):
+        return self.r
+
+    def get_color(self):
+        return self.color
+
+    def get_image(self):
+        return self.image
+
+    def set_type(self, style: str):
+        self.type = style
+
+    def set_m(self, m):
+        self.m = m
+
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
+
+    def set_vx(self, vx):
+        self.vx = vx
+
+    def set_vy(self, vy):
+        self.vy = vy
+
+    def set_fx(self, fx):
+        self.fx = fx
+
+    def set_fy(self, fy):
+        self.fy = fy
+
+    def set_r(self, r):
+        self.r = r
+
+    def set_color(self, color: str):
+        self.color = color
+
+
+    def set_image(self, boolean: bool):
+        self.image = boolean
