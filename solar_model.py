@@ -21,8 +21,9 @@ def calculate_force(body, space_objects):
         y_obj = obj.get_y()
         m_obj = obj.get_m()
         distance = ((x_body - x_obj) ** 2 + (y_body - y_obj) ** 2) ** 0.5
-        fx += gravitational_constant * m_body * m_obj * (x_obj - x_body) / distance ** 3
-        fy += gravitational_constant * m_body * m_obj * (y_obj - y_body) / distance ** 3
+        if distance != 0:
+            fx += gravitational_constant * m_body * m_obj * (x_obj - x_body) / distance ** 3
+            fy += gravitational_constant * m_body * m_obj * (y_obj - y_body) / distance ** 3
         body.set_fx(fx)
         body.set_fy(fy)
 
@@ -39,7 +40,7 @@ def move_space_object(body, dt):
     vy = body.get_vy()
 
     ax = body.get_fx() / body.get_m()
-    ay = body.Fy / body.m
+    ay = body.fy / body.m
     vx += ax * dt
     x += body.vx * dt
     vy += ay * dt
