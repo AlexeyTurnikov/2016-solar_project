@@ -42,13 +42,25 @@ def parse_star_parameters(line, star):
     """
     r, color, m, x, y, vx, vy = line.split()[1], str(line.split()[2]), line.split()[3], line.split()[4], \
                                 line.split()[5], line.split()[6], line.split()[7]
-    star.set_r(r)
+
+    parameters = [r, m, x, y, vx, vy]
+    number_of_parameter = -1
+    for parameter in parameters:
+        number_of_parameter += 1
+        if isinstance(parameter, str) is True:
+            parameter = parameter.split("E")
+            if len(parameter) > 1:
+                parameter[0] = float(parameter[0]) * 10 ** float(parameter[1])
+                parameters[number_of_parameter] = int(parameter[0])
+            else:
+                parameters[number_of_parameter] = int(parameter[0])
+    star.set_r(parameters[0])
     star.set_color(color)
-    star.set_m(m)
-    star.set_x(x)
-    star.set_y(y)
-    star.set_vx(vx)
-    star.set_vy(vy)
+    star.set_m(parameters[1])
+    star.set_x(parameters[2])
+    star.set_y(parameters[3])
+    star.set_vx(parameters[4])
+    star.set_vy(parameters[5])
 
 
 def parse_planet_parameters(line, planet):
@@ -64,13 +76,25 @@ def parse_planet_parameters(line, planet):
     """
     r, color, m, x, y, vx, vy = line.split()[1], str(line.split()[2]), line.split()[3], line.split()[4], \
                                 line.split()[5], line.split()[6], line.split()[7]
-    planet.set_r(r)
+
+    parameters = [r, m, x, y, vx, vy]
+    number_of_parameter = -1
+    for parameter in parameters:
+        number_of_parameter += 1
+        if isinstance(parameter, str) is True:
+            parameter = parameter.split("E")
+            if len(parameter) > 1:
+                parameter[0] = float(parameter[0]) * 10 ** float(parameter[1])
+                parameters[number_of_parameter] = int(parameter[0])
+            else:
+                parameters[number_of_parameter] = int(parameter[0])
+    planet.set_r(parameters[0])
     planet.set_color(color)
-    planet.set_m(m)
-    planet.set_x(x)
-    planet.set_y(y)
-    planet.set_vx(vx)
-    planet.set_vy(vy)
+    planet.set_m(parameters[1])
+    planet.set_x(parameters[2])
+    planet.set_y(parameters[3])
+    planet.set_vx(parameters[4])
+    planet.set_vy(parameters[5])
 
 
 def write_space_objects_data_to_file(output_filename, space_objects):
