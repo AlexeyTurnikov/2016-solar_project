@@ -76,33 +76,38 @@ def parse_planet_parameters(line, planet):
 def write_space_objects_data_to_file(output_filename, space_objects):
     """
     saves the space objects data in the file. output file has the next structure:
-    Star <радиус в пикселах> <цвет> <масса> <x> <y> <Vx> <Vy>,
-    Planet <радиус в пикселах> <цвет> <масса> <x> <y> <Vx> <Vy>.
+    Star <radius in pixels> <color> <mass> <x> <y> <Vx> <Vy>,
+    Planet <radius in pixels> <color> <mass> <x> <y> <Vx> <Vy>.
     :param output_filename: the name of output file
     :param space_objects: the list of the objects parameters of which we write to the file
-
     """
-    with open(output_filename, 'w') as out_file:
-        line = []
+    with open(output_filename, "w") as out_file:
+        now_type = "Star"
         for obj in space_objects:
-            print(out_file, "%s %d %s %f" % ('1', 2, '3', 4.5))
-            if obj.type == "star":
-                line.append("Star")
-            elif obj.type == "planet":
-                line.append("Planet")
-            line.append(obj.r)
-            line.append(obj.color)
-            line.append(obj.m)
-            line.append(obj.x)
-            line.append(obj.y)
-            line.append(obj.vx)
-            line.append(obj.vy)
-            out_file.write(
-                line[0] + " " + line[1] + " " + line[2] + " " + line[3] + " " + line[4] + " " + line[5] + " " + line[
-                    6] + " " + line[7] + "\n")
+            if obj.type == "planet":
+                now_type = "Planet"
+            print(out_file,
+                  "%s %f %s %f %f %f %f %f" % (now_type, obj.r, obj.color, obj.m, obj.x, obj.y, obj.vx, obj.vy))
 
 
-# FIXME: хорошо бы ещё сделать функцию, сохранающую статистику в заданный файл...
+def statistics(output_filename, space_objects, time):
+    """
+    when needed saves parameters of each object in a file which has the next structure:
+    Star <radius in pixels> <color> <mass> <x> <y> <Vx> <Vy>,
+    Planet <radius in pixels> <color> <mass> <x> <y> <Vx> <Vy>.
+    :param output_filename: the name of output file
+    :param space_objects: the list of the objects parameters of which we write to the file
+    :param time: time estimated for the moment when user asks for saving parameters to the file
+    """
+    with open(output_filename, "w") as out_file:
+        now_type = "Star"
+        for obj in space_objects:
+            if obj.type == "planet":
+                now_type = "Planet"
+            print(out_file,
+                  "%s %d %s %f %s %f %f %f %f %f" % (
+                      "time estimated:", time, now_type, obj.r, obj.color, obj.m, obj.x, obj.y, obj.vx, obj.vy))
+
 
 if __name__ == "__main__":
     print("This module is not for direct call!")
