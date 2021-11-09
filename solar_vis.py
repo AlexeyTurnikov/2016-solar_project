@@ -2,6 +2,7 @@
 # license: GPLv3
 import pygame
 
+pygame.init()
 """Модуль визуализации.
 Нигде, кроме этого модуля, не используются экранные координаты объектов.
 Функции, создающие гaрафические объекты и перемещающие их на экране, принимают физические координаты
@@ -13,10 +14,10 @@ header_font = pygame.font.SysFont('Arial', 16)
 window_width = 800
 """Ширина окна"""
 
-window_height = 800
+window_height = 600
 """Высота окна"""
 
-scale_factor = None
+
 """
 Масштабирование экранных координат по отношению к физическим.
 Тип: float
@@ -30,7 +31,7 @@ def calculate_scale_factor(max_distance):
     return scaling
 
 
-def scale_x(body, x):
+def scale_x(body, x, scale_factor):
     """Возвращает экранную **x** координату по **x** координате модели.
     Принимает вещественное число, возвращает целое число.
     В случае выхода **x** координаты за пределы экрана возвращает
@@ -41,7 +42,7 @@ def scale_x(body, x):
     **x** — x-координата модели.
     """
     r = body.get_r()
-    position = int(x * scale_factor) + window_width // 2
+    position = - int(x * scale_factor) + window_width // 2
     if position >= window_width - r:
         position = window_width - r
     if position <= r:
@@ -49,7 +50,7 @@ def scale_x(body, x):
     return position
 
 
-def scale_y(body, y):
+def scale_y(body, y, scale_factor):
     """Возвращает экранную **y** координату по **y** координате модели.
     Принимает вещественное число, возвращает целое число.
     В случае выхода **y** координаты за пределы экрана возвращает
@@ -69,7 +70,7 @@ def scale_y(body, y):
     return position
 
 
-def image(space, body):
+def image(space, body, max_distance):
     """Создаёт отображаемый объект звезды.
 
     Параметры:
@@ -77,9 +78,9 @@ def image(space, body):
     **space** — холст для рисования.
     **star** — объект звезды.
     """
-
-    x = scale_x(body, body.get_x())
-    y = scale_y(body, body.get_y())
+    scale_factor = calculate_scale_factor(max_distance)
+    x = scale_x(body, body.get_x(), scale_factor)
+    y = scale_y(body, body.get_y(), scale_factor)
     r = body.get_r()
     color = body.get_color()
     pygame.draw.circle(space, color, (x, y), r)
@@ -97,24 +98,25 @@ def update_system_name(space, system_name):
     space.blit(words, place)
 
 
-def update_object_position(space, body):
+def update_object_position(space, body, max_distance):
     """Перемещает отображаемый объект на холсте.
     Параметры:
     **space** — холст для рисования.
     **body** — тело, которое нужно переместить.
     """
-    vx = body.get_vx
-    vy = body.get_vy
-    x = scale_x(body, body.get_x()) + vx
-    y = scale_y(body, body.get_y()) + vy
-    r = body.get_r
+    scale_factor = calculate_scale_factor(max_distance)
+    vx = body.get_vx()
+    vy = body.get_vy()
+    x = scale_x(body, body.get_x(), scale_factor) + vx
+    y = scale_y(body, body.get_y(), scale_factor) + vy
+    r = body.get_r()
     # ToDo возможно нужно убрать скорости, может повторять работу из solar_model
     if x - r < 0 or x + r > window_width or y - r < 0 or y + r > window_height:
-        image(space, body)
+        image(space, body, scale_factor)
     else:
-        body.set_x(x)
-        body.set_y(y)
-        image(space, body)
+        body.set_x(x + body.get_x())
+        body.set_y(y + body.get_y())
+        image(space, body, max_distance)
 
 
 if __name__ == "__main__":
