@@ -2,7 +2,6 @@
 # license: GPLv3
 
 import pygame
-from tkinter.filedialog import *
 import solar_vis as vis
 import solar_model as model
 import solar_input
@@ -33,6 +32,11 @@ GREY = (128, 128, 128)
 RED = (200, 50, 100)
 WHITE = (255, 255, 255)
 
+def calculating_max_distance(objects):
+    distances = []
+    for object in objects:
+        distances.append(max(abs(object.get_x()), abs(object.get_y())))
+    return max(distances)
 
 def writing(text: str, xcenter, ycenter, font_size=16):
     font = pygame.font.SysFont('Arial', font_size)
@@ -50,11 +54,11 @@ class Button:
         self.width = width
         self.text = text
         self.color = GREY
-        self.pressed = FALSE
+        self.pressed = False
         self.timer = 0
 
     def draw(self):
-        if self.pressed is TRUE:
+        if self.pressed is True:
             self.color = RED
         else:
             self.color = GREY
@@ -67,7 +71,7 @@ class Button:
 
     def is_button_pressed(self, event):
         if self.x < event.pos[0] < self.x + self.length and self.y < event.pos[1] < self.y + self.width:
-            self.pressed = TRUE
+            self.pressed = True
             self.timer = 1
             print("pressed")
 
@@ -93,41 +97,32 @@ class Timer(Button):
         return time_step
 
 
-def save_file_dialog():
-    """Открывает диалоговое окно выбора имени файла и вызывает
-    функцию считывания параметров системы небесных тел из данного файла.
-    Считанные объекты сохраняются в глобальный список space_objects
-    """
-    out_filename = asksaveasfilename(filetypes=(("Text file", ".txt"),))
-    solar_input.write_space_objects_data_to_file(out_filename, space_objects)
-
-
 def main():
     """Главная функция главного модуля.
     Создаёт объекты графического дизайна библиотеки tkinter: окно, холст, фрейм с кнопками, кнопки.
     """
     pygame.init()
+    loaded_file = "one_satellite.txt"
     print('Modelling started!')
     physical_time = 0
-    start = 1
-    distances =[]
+    start = 0
+    loading_file = 0
+    loading_is_over = 0
+    text_filename = "_"
+    distances = []
     finished = False
-
-    start_button = Button(0, 600, 100, 200, "start")
+    start_button = Button(0, 600, 100, 100, "start")
+    pause_button = Button(0, 700, 100, 100, "pause")
     timer = Timer(100, 600, 200, 200, "time:")
     load_from_file_button = Button(300, 600, 150, 200, "load_from_file")
     save_file_button = Button(450, 600, 150, 200, "save_file")
-    buttons = [start_button, load_from_file_button, save_file_button]
-
-    objects = solar_input.read_space_objects_data_from_file("solar_system.txt")
-    for object in objects:
-        distances.append(max(abs(object.get_x()), abs(object.get_y())))
-    max_distance = max(distances)
-
-
+    buttons = [start_button, pause_button, load_from_file_button, save_file_button]
+    objects = solar_input.read_space_objects_data_from_file(loaded_file)
+    max_distance = calculating_max_distance(objects)
+    SCREEN.fill(WHITE)
     while not finished:
         clock.tick(FPS)
-        SCREEN.fill(WHITE)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
@@ -136,17 +131,48 @@ def main():
                     button.is_button_pressed(event)
                     if start_button.pressed is True:
                         start = 1
-            if event.type == pygame.KEYDOWN:
-                timer.update(event)
-        for button in buttons:
-            button.draw()
+                        loading_file = 0
+                    if pause_button.pressed is True:
+                        start = 0
+                    if load_from_file_button.pressed is True:
+                        start = 0
+                        loading_file = 1
 
+            if event.type == pygame.KEYDOWN:
+                if loading_file == 0:
+                    timer.update(event)
+                if start == 0:
+                    if event.key == pygame.K_BACKSPACE and len(text_filename) >= 1:
+                        text_filename = text_filename[:-1]
+                    else:
+                        text_filename += event.unicode
+                        text_filename = "".join(c for c in text_filename if not c.isdecimal()) #переименовать c
+                if event.key == pygame.K_RETURN:
+                    loading_is_over = 1
         if start == 1:
 
+            SCREEN.fill(WHITE)
             for object in objects:
                 model.recalculate_space_objects_positions(objects, timer.set_physical_time())
-                vis.update_object_position(SCREEN, object, max_distance)
-                vis.image(SCREEN, object, max_distance)
+                vis.update_object_position(SCREEN, object, max_distance, timer.set_physical_time())
+
+
+        if loading_file == 1:
+            SCREEN.fill(WHITE)
+            writing("Выберите файл для моделирования из доступных:", 300, 100, 24)
+            writing("one_satellite.txt", 300, 150, 32)
+            writing("solar_system.txt", 300, 200, 32)
+            writing(text_filename, 300, 300, 64)
+            if loading_is_over == 1:
+                splitted_text_filename = text_filename.rsplit()
+                objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))
+                max_distance = calculating_max_distance(objects)
+                text_filename = "_"
+                loading_is_over = 0
+                loading_file = 0
+                start = 1
+        for button in buttons:
+            button.draw()
 
         timer.draw()
         pygame.display.update()
