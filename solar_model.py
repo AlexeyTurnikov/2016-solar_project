@@ -23,7 +23,7 @@ def calculate_force(body, space_objects):
         distance = ((x_body - x_obj) ** 2 + (y_body - y_obj) ** 2) ** 0.5
         if distance != 0:
             fx += gravitational_constant * m_body * m_obj * (x_obj - x_body) / distance ** 3
-            fy += gravitational_constant * m_body * m_obj * (y_obj - y_body) / distance ** 3
+            fy -= gravitational_constant * m_body * m_obj * (y_obj - y_body) / distance ** 3
         body.set_fx(fx)
         body.set_fy(fy)
 

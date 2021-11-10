@@ -11,7 +11,7 @@ pygame.init()
 header_font = pygame.font.SysFont('Arial', 16)
 """Шрифт в заголовке"""
 
-window_width = 800
+window_width = 600
 """Ширина окна"""
 
 window_height = 600
@@ -98,7 +98,7 @@ def update_system_name(space, system_name):
     space.blit(words, place)
 
 
-def update_object_position(space, body, max_distance):
+def update_object_position(space, body, max_distance, dt):
     """Перемещает отображаемый объект на холсте.
     Параметры:
     **space** — холст для рисования.
@@ -107,16 +107,14 @@ def update_object_position(space, body, max_distance):
     scale_factor = calculate_scale_factor(max_distance)
     vx = body.get_vx()
     vy = body.get_vy()
-    x = scale_x(body, body.get_x(), scale_factor) + vx
-    y = scale_y(body, body.get_y(), scale_factor) + vy
+    x = scale_x(body, body.get_x(), scale_factor) + vx*dt
+    y = scale_y(body, body.get_y(), scale_factor) + vy*dt
     r = body.get_r()
     # ToDo возможно нужно убрать скорости, может повторять работу из solar_model
-    if x - r < 0 or x + r > window_width or y - r < 0 or y + r > window_height:
-        image(space, body, scale_factor)
-    else:
-        body.set_x(x + body.get_x())
-        body.set_y(y + body.get_y())
-        image(space, body, max_distance)
+
+    body.set_x(x + body.get_x())
+    body.set_y(y + body.get_y())
+    image(space, body, max_distance)
 
 
 if __name__ == "__main__":
