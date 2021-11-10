@@ -13,8 +13,8 @@ def calculate_force(body, space_objects):
     x_body = body.get_x()
     y_body = body.get_y()
     m_body = body.get_m()
-    fx = body.get_fx()
-    fy = body.get_fy()
+    fx = 0
+    fy = 0
 
     for obj in space_objects:
         x_obj = obj.get_x()
@@ -23,7 +23,7 @@ def calculate_force(body, space_objects):
         distance = ((x_body - x_obj) ** 2 + (y_body - y_obj) ** 2) ** 0.5
         if distance != 0:
             fx += gravitational_constant * m_body * m_obj * (x_obj - x_body) / distance ** 3
-            fy -= gravitational_constant * m_body * m_obj * (y_obj - y_body) / distance ** 3
+            fy += gravitational_constant * m_body * m_obj * (y_obj - y_body) / distance ** 3
         body.set_fx(fx)
         body.set_fy(fy)
 
@@ -42,15 +42,14 @@ def move_space_object(body, dt):
     ax = body.get_fx() / body.get_m()
     ay = body.fy / body.m
     vx += ax * dt
-    x += body.vx * dt
+    x += body.vx * dt + ax * dt ** 2 / 2
     vy += ay * dt
-    y += vy * dt
+    y += vy * dt + ay * dt ** 2 / 2
 
     body.set_x(x)
     body.set_y(y)
     body.set_vx(vx)
     body.set_vy(vy)
-    # FIXME: not sure if this works
 
 
 def recalculate_space_objects_positions(space_objects, dt):

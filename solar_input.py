@@ -25,7 +25,7 @@ def read_space_objects_data_from_file(input_filename):
                 parse_planet_parameters(line, planet)
                 objects.append(planet)
             else:
-                print("Unknown space object")
+                print("unknown space object")
     return objects
 
 
@@ -97,23 +97,6 @@ def parse_planet_parameters(line, planet):
     planet.set_vy(parameters[5])
 
 
-def write_space_objects_data_to_file(output_filename, space_objects):
-    """
-    saves the space objects data in the file. output file has the next structure:
-    Star <radius in pixels> <color> <mass> <x> <y> <Vx> <Vy>,
-    Planet <radius in pixels> <color> <mass> <x> <y> <Vx> <Vy>.
-    :param output_filename: the name of output file
-    :param space_objects: the list of the objects parameters of which we write to the file
-    """
-    with open(output_filename, "w") as out_file:
-        now_type = "Star"
-        for obj in space_objects:
-            if obj.type == "planet":
-                now_type = "Planet"
-            print(out_file,
-                  "%s %f %s %f %f %f %f %f" % (now_type, obj.r, obj.color, obj.m, obj.x, obj.y, obj.vx, obj.vy))
-
-
 def statistics(output_filename, space_objects, time):
     """
     when needed saves parameters of each object in a file which has the next structure:
@@ -124,13 +107,8 @@ def statistics(output_filename, space_objects, time):
     :param time: time estimated for the moment when user asks for saving parameters to the file
     """
     with open(output_filename, "w") as out_file:
-        now_type = "Star"
         for obj in space_objects:
-            if obj.type == "planet":
-                now_type = "Planet"
-            print(out_file,
-                  "%s %d %s %f %s %f %f %f %f %f" % (
-                      "time estimated:", time, now_type, obj.r, obj.color, obj.m, obj.x, obj.y, obj.vx, obj.vy))
+            print(f"{obj.type} {obj.R} {obj.color} {obj.m} {obj.x} {obj.y} {obj.Vx} {obj.Vy}", file=out_file)
 
 
 if __name__ == "__main__":

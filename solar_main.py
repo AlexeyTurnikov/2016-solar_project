@@ -1,6 +1,6 @@
 # coding: utf-8
 # license: GPLv3
-# В процессе
+
 import pygame
 import solar_vis as vis
 import solar_model as model
