@@ -108,7 +108,7 @@ def statistics(output_filename, space_objects, time):
     """
     with open(output_filename, "w") as out_file:
         for obj in space_objects:
-            print(f"{obj.type} {obj.R} {obj.color} {obj.m} {obj.x} {obj.y} {obj.Vx} {obj.Vy}", file=out_file)
+            print(f"{obj.type} {obj.r} {obj.color} {obj.m} {obj.x} {obj.y} {obj.vx} {obj.vy}", file=out_file)
 
 
 if __name__ == "__main__":

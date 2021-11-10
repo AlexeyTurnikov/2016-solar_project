@@ -36,7 +36,9 @@ def scale_x(body, x, scale_factor):
     Принимает вещественное число, возвращает целое число.
     В случае выхода **x** координаты за пределы экрана возвращает
     координату, лежащую за пределами холста.
+
     Параметры:
+
     **x** — x-координата модели.
     """
     r = body.get_r()
@@ -54,7 +56,9 @@ def scale_y(body, y, scale_factor):
     В случае выхода **y** координаты за пределы экрана возвращает
     координату, лежащую за пределами холста.
     Направление оси развёрнуто, чтобы у модели ось **y** смотрела вверх.
+
     Параметры:
+
     **y** — y-координата модели.
     """
     r = body.get_r()
@@ -66,9 +70,11 @@ def scale_y(body, y, scale_factor):
     return position
 
 
-def image(space, body, max_distance):
+def update_object_position(space, body, max_distance):
     """Создаёт отображаемый объект звезды.
+
     Параметры:
+
     **space** — холст для рисования.
     **star** — объект звезды.
     """
@@ -92,21 +98,7 @@ def update_system_name(space, system_name):
     space.blit(words, place)
 
 
-def update_object_position(space, body, max_distance, dt):
-    """Перемещает отображаемый объект на холсте.
-    Параметры:
-    **space** — холст для рисования.
-    **body** — тело, которое нужно переместить.
-    """
-    scale_factor = calculate_scale_factor(max_distance)
-    vx = body.get_vx()
-    vy = body.get_vy()
-    x = scale_x(body, body.get_x(), scale_factor) + vx*dt
-    y = scale_y(body, body.get_y(), scale_factor) + vy*dt
-    r = body.get_r()
-    # ToDo возможно нужно убрать скорости, может повторять работу из solar_model
 
-    image(space, body, max_distance)
 
 
 if __name__ == "__main__":

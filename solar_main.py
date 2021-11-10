@@ -32,11 +32,13 @@ GREY = (128, 128, 128)
 RED = (200, 50, 100)
 WHITE = (255, 255, 255)
 
+
 def calculating_max_distance(objects):
     distances = []
     for object in objects:
         distances.append(max(abs(object.get_x()), abs(object.get_y())))
     return max(distances)
+
 
 def writing(text: str, xcenter, ycenter, font_size=16):
     font = pygame.font.SysFont('Arial', font_size)
@@ -93,7 +95,10 @@ class Timer(Button):
             self.time = "".join(c for c in self.time if c.isdecimal())  # проверяет введена ли цифра
 
     def set_physical_time(self):
-        time_step = int(self.time)
+        if len(self.time) >= 1:
+            time_step = int(self.time)
+        else:
+            time_step = 1
         return time_step
 
 
@@ -108,8 +113,8 @@ def main():
     start = 0
     loading_file = 0
     loading_is_over = 0
+    saving_to_file = 0
     text_filename = "_"
-    distances = []
     finished = False
     start_button = Button(0, 600, 100, 100, "start")
     pause_button = Button(0, 700, 100, 100, "pause")
@@ -122,7 +127,6 @@ def main():
     SCREEN.fill(WHITE)
     while not finished:
         clock.tick(FPS)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
@@ -137,7 +141,8 @@ def main():
                     if load_from_file_button.pressed is True:
                         start = 0
                         loading_file = 1
-
+                    if save_file_button.pressed is True:
+                        saving_to_file = 1
             if event.type == pygame.KEYDOWN:
                 if loading_file == 0:
                     timer.update(event)
@@ -146,16 +151,17 @@ def main():
                         text_filename = text_filename[:-1]
                     else:
                         text_filename += event.unicode
-                        text_filename = "".join(c for c in text_filename if not c.isdecimal()) #переименовать c
+                        text_filename = "".join(c for c in text_filename if not c.isdecimal())  # переименовать c
                 if event.key == pygame.K_RETURN:
                     loading_is_over = 1
-        if start == 1:
 
+        if start == 1:
+            physical_time += timer.set_physical_time()
             SCREEN.fill(WHITE)
+            writing(str(physical_time), 50, 50)
             for object in objects:
                 model.recalculate_space_objects_positions(objects, timer.set_physical_time())
-                vis.update_object_position(SCREEN, object, max_distance, timer.set_physical_time())
-
+                vis.update_object_position(SCREEN, object, max_distance)
 
         if loading_file == 1:
             SCREEN.fill(WHITE)
@@ -168,9 +174,14 @@ def main():
                 objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))
                 max_distance = calculating_max_distance(objects)
                 text_filename = "_"
+                physical_time = 0
                 loading_is_over = 0
                 loading_file = 0
                 start = 1
+
+        if saving_to_file == 1:
+            solar_input.statistics("stats.txt", objects, physical_time)
+            saving_to_file = 0
         for button in buttons:
             button.draw()
 
