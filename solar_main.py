@@ -15,7 +15,7 @@ FPS = 30  # Количество кадров в секунду
 # Цвета
 GREY = (128, 128, 128)
 RED = (200, 50, 100)
-WHITE = (255, 255, 255)
+WHITE = (255, 255, 200)
 BLACK = (0, 0, 0)
 
 SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -203,7 +203,8 @@ def main():
             writing("Выберите файл для моделирования из доступных:", 300, 100, 24)
             writing("one_satellite.txt", 300, 150, 32)
             writing("solar_system.txt", 300, 200, 32)
-            writing(text_filename, 300, 300, 64)
+            writing("double_star.txt", 300, 250, 32)
+            writing(text_filename, 300, 350, 64)
             if loading_is_over == 1:  # запускается после того, как пользователь ввел название нового файла
                 splitted_text_filename = text_filename.rsplit()
                 objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))

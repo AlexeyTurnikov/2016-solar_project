@@ -1,6 +1,6 @@
 # coding: utf-8
 # license: GPLv3
-#В процессе
+# В процессе
 
 class Star:
     """Тип данных, описывающий звезду.
@@ -134,6 +134,10 @@ class Planet:
 
     color = "green"
     """Цвет планеты"""
+    v_massive = []
+    """Скорости планеты в различные моменты времени"""
+    distance_massive = []
+    """Расстояние до центра планеты в различные моменты времени"""
 
     def get_type(self):
         return self.type
@@ -165,6 +169,12 @@ class Planet:
     def get_color(self):
         return self.color
 
+    def get_v_massive(self):
+        return self.v_massive
+
+    def get_distance_massive(self):
+        return self.distance_massive
+
     def set_type(self, style: str):
         self.type = style
 
@@ -194,3 +204,9 @@ class Planet:
 
     def set_color(self, color: str):
         self.color = color
+
+    def append_v_massive(self, v):
+        self.v_massive.append(v)
+
+    def append_distance_massive(self, distance):
+        self.distance_massive.append(distance)
