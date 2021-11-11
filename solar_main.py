@@ -6,48 +6,26 @@ import solar_vis as vis
 import solar_model as model
 import solar_input
 
-perform_execution = False
-"""Флаг цикличности выполнения расчёта"""
+HEIGHT = 800  # Высота экрана
 
-physical_time = 0
-"""Физическое время от начала расчёта.
-Тип: float"""
+WIDTH = 600  # Ширина экрана
 
-displayed_time = None
-"""Отображаемое на экране время.
-Тип: переменная tkinter"""
+FPS = 30  # Количество кадров в секунду
 
-time_step = None
-"""Шаг по времени при моделировании.
-Тип: float"""
-
-space_objects = []
-"""Список космических объектов."""
-HEIGHT = 800
-WIDTH = 600
-FPS = 30
-SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
-clock = pygame.time.Clock()
+# Цвета
 GREY = (128, 128, 128)
 RED = (200, 50, 100)
 WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
-
-def calculating_max_distance(objects):
-    distances = []
-    for object in objects:
-        distances.append(max(abs(object.get_x()), abs(object.get_y())))
-    return max(distances)
-
-
-def writing(text: str, xcenter, ycenter, font_size=16):
-    font = pygame.font.SysFont('Arial', font_size)
-    words = font.render(text, True, (0, 0, 0))
-    place = words.get_rect(center=(xcenter, ycenter))
-    SCREEN.blit(words, place)
+SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
+clock = pygame.time.Clock()
 
 
 class Button:
+    """
+    Класс, отвечающий за кнопки, которые создаются на экране.
+    """
 
     def __init__(self, x, y, length, width, text: str, ):
         self.x = x
@@ -56,29 +34,37 @@ class Button:
         self.width = width
         self.text = text
         self.color = GREY
-        self.pressed = False
-        self.timer = 0
+        self.pressed = False  # Нажата ли кнопка?
+        self.timer = 0  # время, прошедшее с нажатия на кнопку, кнопка горит 1 секунду после нажатия.
 
     def draw(self):
-        if self.pressed is True:
+        """Функция, отвечающая за отрисовку кнопки на экране."""
+        if self.pressed is True:  # Нажатая кнопка загорается красным
             self.color = RED
         else:
             self.color = GREY
         pygame.draw.rect(SCREEN, self.color, (self.x, self.y, self.length, self.width))
+        pygame.draw.rect(SCREEN, BLACK, (self.x, self.y, self.length, self.width), 1)
+        writing(self.text, self.x + self.length / 2, self.y + self.width / 2)
         if self.timer > 0:
             self.timer += 1
         if self.timer % 30 == 0:
             self.pressed = False
-        writing(self.text, self.x + self.length / 2, self.y + self.width / 2)
 
     def is_button_pressed(self, event):
+        """
+        Функция, проверяющая нажата ли кнопка.
+        """
         if self.x < event.pos[0] < self.x + self.length and self.y < event.pos[1] < self.y + self.width:
             self.pressed = True
             self.timer = 1
-            print("pressed")
 
 
 class Timer(Button):
+    """
+    Подкласс Button, отличается наличием функции ввода времени.
+    """
+
     def __init__(self, x, y, length, width, text: str):
         super().__init__(x, y, length, width, text)
         self.time = "1"
@@ -88,13 +74,20 @@ class Timer(Button):
         writing(self.time, self.x + self.length / 2, self.y + 2 * self.width / 3)
 
     def update(self, event):
+        """
+        Функция, отвечающая за ввод времени с клавиатуры, на вход принимаются только цифры.
+        """
         if event.key == pygame.K_BACKSPACE and len(self.time) >= 1:
             self.time = self.time[:-1]
         elif len(self.time) <= 10:
             self.time += event.unicode
-            self.time = "".join(c for c in self.time if c.isdecimal())  # проверяет введена ли цифра
+            self.time = "".join(symbol for symbol in self.time if symbol.isdecimal())  # проверяет введена ли цифра
 
-    def set_physical_time(self):
+    def set_time_step(self):
+        """
+        Функция, которая возвращает время введенное с клавиатуры.
+        Возвращает шаг времени в физическом моделировании.
+        """
         if len(self.time) >= 1:
             time_step = int(self.time)
         else:
@@ -102,74 +95,116 @@ class Timer(Button):
         return time_step
 
 
+def calculating_max_distance(objects):
+    """
+    Функция, отвечающая за рассчет максимального расстояния между телами.
+    """
+    distances = []
+    for obj in objects:
+        distances.append(max(abs(obj.get_x()), abs(obj.get_y())))
+    return max(distances)
+
+
+def writing(text: str, xcenter, ycenter, font_size=16):
+    """Функция, отвечающая за вывод текста на экран
+    :param text: текст, который будет выведен на экран
+    :param xcenter: x координата центра
+    :param ycenter: y координата центра
+    :param font_size: размер шрифта, стандартный шрифт Arial
+    """
+    font = pygame.font.SysFont('Arial', font_size)
+    words = font.render(text, True, (0, 0, 0))
+    place = words.get_rect(center=(xcenter, ycenter))
+    SCREEN.blit(words, place)
+
+
+def statecheck(starting, pausing, loading, start, loading_file):
+    """
+    Проверяет, на какую из кнопок нажал пользователь.
+    :param starting: кнопка, отвечающая за начало моделирования
+    :param pausing: кнопка, отвечающая за приостановку моделирования
+    :param loading: кнопка, отвечающая за загрузку нового файла
+    :param start: параметр, отвечающий за то началось ли моделирование
+    :param loading_file: параметр, отвечающий за то началась ли загрузка нового файла
+    """
+    if starting.pressed is True:
+        start = 1
+        loading_file = 0
+    if pausing.pressed is True:
+        start = 0
+        loading_file = 0
+    if loading.pressed is True:
+        start = 0
+        loading_file = 1
+    return start, loading_file
+
+
 def main():
-    """Главная функция главного модуля.
-    Создаёт объекты графического дизайна библиотеки tkinter: окно, холст, фрейм с кнопками, кнопки.
+    """
+    Главная функция главного модуля. Отвечает за всё.
     """
     pygame.init()
-    loaded_file = "one_satellite.txt"
-    print('Modelling started!')
-    physical_time = 0
-    start = 0
-    loading_file = 0
-    loading_is_over = 0
-    saving_to_file = 0
-    text_filename = "_"
+    loaded_file = "one_satellite.txt"  # Файл, который будет загружен изначально.
+    physical_time = 0  # Физическое время, прошедшее со старта моделирования.
+    start = 0  # == 1, если моделирование запущено; == 0, если моделирование остановлено;
+    loading_file = 0  # == 1, если нажата кнопка load file; == 0, если пользователь ввел новый файл и  нажал Enter.
+    loading_is_over = 0  # == 1, если пользователь ввел название нового файла; == 0, когда введенные данные обработаны.
+    text_filename = "_"  # переменная, в которой хранится введенный текст для смены файла.
+
     finished = False
+
     start_button = Button(0, 600, 100, 100, "start")
     pause_button = Button(0, 700, 100, 100, "pause")
     timer = Timer(100, 600, 200, 200, "time:")
     load_from_file_button = Button(300, 600, 150, 200, "load_from_file")
     save_file_button = Button(450, 600, 150, 200, "save_file")
-    buttons = [start_button, pause_button, load_from_file_button, save_file_button]
+    buttons = [start_button, pause_button, load_from_file_button, save_file_button]  # массив с нажимаемыми кнопками.
     objects = solar_input.read_space_objects_data_from_file(loaded_file)
+
     max_distance = calculating_max_distance(objects)
+
     SCREEN.fill(WHITE)
-    while not finished:
+    print('Modelling started!')
+
+    while not finished:  # главный цикл главного модуля
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
             if event.type == pygame.MOUSEBUTTONUP:
-                for button in buttons:
+                for button in buttons:  # Проверяет на какую кнопку нажал пользователь
                     button.is_button_pressed(event)
-                    if start_button.pressed is True:
-                        start = 1
-                        loading_file = 0
-                    if pause_button.pressed is True:
-                        start = 0
-                    if load_from_file_button.pressed is True:
-                        start = 0
-                        loading_file = 1
-                    if save_file_button.pressed is True:
-                        saving_to_file = 1
+                start, loading_file = statecheck(start_button, pause_button, load_from_file_button, start, loading_file)
+                if save_file_button.pressed is True:
+                    solar_input.statistics("stats.txt", objects, physical_time)
             if event.type == pygame.KEYDOWN:
-                if loading_file == 0:
+                if loading_file == 0:  # если не идет загрузка
                     timer.update(event)
                 if start == 0:
-                    if event.key == pygame.K_BACKSPACE and len(text_filename) >= 1:
+                    # если моделирование не запущено, то нажатые буквы выводятся на экран, записываются в text_filename
+                    if event.key == pygame.K_BACKSPACE and len(text_filename) >= 1:  # стирает последний символ
                         text_filename = text_filename[:-1]
                     else:
                         text_filename += event.unicode
-                        text_filename = "".join(c for c in text_filename if not c.isdecimal())  # переименовать c
-                if event.key == pygame.K_RETURN:
+                        text_filename = "".join(symbol for symbol in text_filename if not symbol.isdecimal())
+                if event.key == pygame.K_RETURN:  # если нажат Enter, то запускается обработка введенного текста.
                     loading_is_over = 1
 
-        if start == 1:
-            physical_time += timer.set_physical_time()
+        if start == 1:  # выполняется, если моделирование запущено.
+            physical_time += timer.set_time_step()
             SCREEN.fill(WHITE)
             writing(str(physical_time), 50, 50)
-            for object in objects:
-                model.recalculate_space_objects_positions(objects, timer.set_physical_time())
-                vis.update_object_position(SCREEN, object, max_distance)
+            for obj in objects:
+                model.recalculate_space_objects_positions(objects, timer.set_time_step())
+                vis.update_object_position(SCREEN, obj, max_distance)
 
-        if loading_file == 1:
+        if loading_file == 1:  # выполняется после нажатия на кнопку load file
             SCREEN.fill(WHITE)
             writing("Выберите файл для моделирования из доступных:", 300, 100, 24)
             writing("one_satellite.txt", 300, 150, 32)
             writing("solar_system.txt", 300, 200, 32)
             writing(text_filename, 300, 300, 64)
-            if loading_is_over == 1:
+            if loading_is_over == 1:  # запускается после того, как пользователь ввел название нового файла
                 splitted_text_filename = text_filename.rsplit()
                 objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))
                 max_distance = calculating_max_distance(objects)
@@ -179,13 +214,10 @@ def main():
                 loading_file = 0
                 start = 1
 
-        if saving_to_file == 1:
-            solar_input.statistics("stats.txt", objects, physical_time)
-            saving_to_file = 0
         for button in buttons:
             button.draw()
-
         timer.draw()
+
         pygame.display.update()
 
     print('Modelling finished!')
