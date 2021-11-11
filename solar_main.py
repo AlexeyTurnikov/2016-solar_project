@@ -5,6 +5,8 @@ import pygame
 import solar_vis as vis
 import solar_model as model
 import solar_input
+from solar_objects import Star
+import matplotlib.pyplot as plt
 
 HEIGHT = 800  # Высота экрана
 
@@ -139,6 +141,45 @@ def statecheck(starting, pausing, loading, start, loading_file):
     return start, loading_file
 
 
+def save_planet_parameters(planet, physical_time):
+    i = 1
+    if physical_time - i * 500000 > 0:
+        planet.append_v_massive((planet.get_vx() ** 2 + planet.get_vy() ** 2) ** 0.5)
+        planet.append_distance_massive((planet.get_x() ** 2 + planet.get_y() ** 2) ** 0.5)
+        i += 1
+
+
+def painting_graphics(planet):
+    velocity = planet.get_v_massive()
+    distance = planet.get_distance_massive()
+    time = []
+    for timer in range(0, 500000 * len(velocity), 500000):
+        time.append(timer)
+    plt.subplot(121)
+    plt.plot(time, velocity)
+    plt.title('$Velocity$')
+    plt.xlabel("time, years")
+    plt.ylabel("velocity, km/years")
+    plt.grid(True)
+    plt.subplot(222)
+    plt.plot(time, distance)
+    plt.title(r'$Distance to planet$')
+    plt.xlabel("time, years")
+    plt.ylabel("distance, km")
+    plt.grid(True)
+    plt.subplot(223)
+    plt.plot(distance, velocity)
+    plt.title(r'$Distance/Velocity$,')
+    plt.xlabel("distance, km")
+    plt.ylabel("velocity, km/years")
+    plt.grid(True)
+    plt.show()
+
+
+def visualising_process(objects):
+    pass
+
+
 def main():
     """
     Главная функция главного модуля. Отвечает за всё.
@@ -150,15 +191,17 @@ def main():
     loading_file = 0  # == 1, если нажата кнопка load file; == 0, если пользователь ввел новый файл и  нажал Enter.
     loading_is_over = 0  # == 1, если пользователь ввел название нового файла; == 0, когда введенные данные обработаны.
     text_filename = "_"  # переменная, в которой хранится введенный текст для смены файла.
-
+    visualising = 0  # == 1, если нажата кнопка graphics; ==0, если пользователь выбрал планету, для которой хочет построить график.
     finished = False
 
     start_button = Button(0, 600, 100, 100, "start")
     pause_button = Button(0, 700, 100, 100, "pause")
     timer = Timer(100, 600, 200, 200, "time:")
     load_from_file_button = Button(300, 600, 150, 200, "load_from_file")
-    save_file_button = Button(450, 600, 150, 200, "save_file")
-    buttons = [start_button, pause_button, load_from_file_button, save_file_button]  # массив с нажимаемыми кнопками.
+    save_file_button = Button(450, 600, 150, 100, "save_file")
+    graphic_button = Button(450, 700, 150, 100, "Graphics")
+    buttons = [start_button, pause_button, load_from_file_button, save_file_button,
+               graphic_button]  # массив с нажимаемыми кнопками.
     objects = solar_input.read_space_objects_data_from_file(loaded_file)
 
     max_distance = calculating_max_distance(objects)
@@ -177,6 +220,9 @@ def main():
                 start, loading_file = statecheck(start_button, pause_button, load_from_file_button, start, loading_file)
                 if save_file_button.pressed is True:
                     solar_input.statistics("stats.txt", objects, physical_time)
+                if graphic_button.pressed is True:
+                    visualising = 1
+                    print(objects[1].get_v_massive())
             if event.type == pygame.KEYDOWN:
                 if loading_file == 0:  # если не идет загрузка
                     timer.update(event)
@@ -208,13 +254,20 @@ def main():
             if loading_is_over == 1:  # запускается после того, как пользователь ввел название нового файла
                 splitted_text_filename = text_filename.rsplit()
                 objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))
+                loaded_file = splitted_text_filename[0]
                 max_distance = calculating_max_distance(objects)
                 text_filename = "_"
                 physical_time = 0
                 loading_is_over = 0
                 loading_file = 0
                 start = 1
+        if visualising == 1:
+            pass
+#TODO 123123
 
+        for planet in objects:
+            if not isinstance(planet, Star):
+                save_planet_parameters(planet, physical_time)
         for button in buttons:
             button.draw()
         timer.draw()
