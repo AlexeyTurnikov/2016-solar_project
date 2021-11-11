@@ -112,7 +112,7 @@ def statistics(output_filename, space_objects, time):
         for obj in space_objects:
             if obj.type == "planet":
                 print(f"{count} {time} {obj.type} {obj.x} {obj.y} {obj.vx} {obj.vy}", file=out_file)
-                line = str(count) + str(obj.get_distance_massive()) + str(obj.get_v_massive()) + "\n"
+                line = str(count) + " " + str(obj.get_distance_massive()) + " " + str(obj.get_v_massive()) + "\n"
                 out_file.write(line)
             count += 1
 
