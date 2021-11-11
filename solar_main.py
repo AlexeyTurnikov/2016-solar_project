@@ -120,7 +120,7 @@ def writing(text: str, xcenter, ycenter, font_size=16):
     SCREEN.blit(words, place)
 
 
-def statecheck(starting, pausing, loading, start, loading_file):
+def statecheck(starting, pausing, loading, visualise, start, loading_file, visualising):
     """
     Проверяет, на какую из кнопок нажал пользователь.
     :param starting: кнопка, отвечающая за начало моделирования
@@ -132,13 +132,20 @@ def statecheck(starting, pausing, loading, start, loading_file):
     if starting.pressed is True:
         start = 1
         loading_file = 0
+        visualising = 0
     if pausing.pressed is True:
         start = 0
         loading_file = 0
+        visualising = 0
     if loading.pressed is True:
         start = 0
         loading_file = 1
-    return start, loading_file
+        visualising = 0
+    if visualise.pressed is True:
+        start = 0
+        loading_file = 0
+        visualising = 1
+    return start, loading_file, visualising
 
 
 def save_planet_parameters(planet, physical_time):
@@ -155,7 +162,7 @@ def painting_graphics(planet):
     time = []
     for timer in range(0, 500000 * len(velocity), 500000):
         time.append(timer)
-    plt.subplot(121)
+    plt.subplot(221)
     plt.plot(time, velocity)
     plt.title('$Velocity$')
     plt.xlabel("time, years")
@@ -176,8 +183,36 @@ def painting_graphics(planet):
     plt.show()
 
 
-def visualising_process(objects):
-    pass
+def visualising_process(objects, loaded_file, number_of_planet):
+    visualising = 1
+    start = 0
+    print(number_of_planet)
+    names = ["Mercury", "Venus", "Earth", "Mars", "Jupyter", "Saturn", "Uranus", "Neptune"]
+    writing("Введите номер выбранной планеты", 300, 100)
+    if loaded_file == "solar_system.txt":
+        for i in range(0, len(objects) - 1):
+            writing(names[i] + " [ " + str(i) + " ] ", 300, 125 + i * 25)
+    if loaded_file == "double_star.txt":
+        writing("Ни один из обьектов", 300, 125)
+        writing("не является планетой", 300, 150)
+        if number_of_planet is not False and number_of_planet is not None:
+            number_of_planet = False
+            visualising = 0
+            start = 1
+    if loaded_file == "one_satellite.txt":
+        writing("planet [0]", 300, 125)
+    if (not str(number_of_planet).isdecimal() or str(
+            number_of_planet).isdecimal() and int(number_of_planet) > len(
+        objects) - 2) and number_of_planet is not None and number_of_planet is not False:
+        writing("Введите другой номер", 300, 350, 32)
+
+    elif number_of_planet is not None and number_of_planet is not False:
+        painting_graphics(objects[int(number_of_planet) + 1])
+        number_of_planet = False
+        visualising = 0
+        start = 1
+
+    return number_of_planet, visualising, start
 
 
 def main():
@@ -191,7 +226,8 @@ def main():
     loading_file = 0  # == 1, если нажата кнопка load file; == 0, если пользователь ввел новый файл и  нажал Enter.
     loading_is_over = 0  # == 1, если пользователь ввел название нового файла; == 0, когда введенные данные обработаны.
     text_filename = "_"  # переменная, в которой хранится введенный текст для смены файла.
-    visualising = 0  # == 1, если нажата кнопка graphics; ==0, если пользователь выбрал планету, для которой хочет построить график.
+    visualising = 0  # == 1, если нажата кнопка graphics; ==0, если пользователь выбрал обьект для постройки графика.
+    number_of_planet = False  # номер планеты, для которой необходимо вывести график
     finished = False
 
     start_button = Button(0, 600, 100, 100, "start")
@@ -217,17 +253,15 @@ def main():
             if event.type == pygame.MOUSEBUTTONUP:
                 for button in buttons:  # Проверяет на какую кнопку нажал пользователь
                     button.is_button_pressed(event)
-                start, loading_file = statecheck(start_button, pause_button, load_from_file_button, start, loading_file)
+                start, loading_file, visualising = statecheck(start_button, pause_button, load_from_file_button,
+                                                              graphic_button, start, loading_file, visualising)
                 if save_file_button.pressed is True:
                     solar_input.statistics("stats.txt", objects, physical_time)
-                if graphic_button.pressed is True:
-                    visualising = 1
-                    print(objects[1].get_v_massive())
             if event.type == pygame.KEYDOWN:
-                if loading_file == 0:  # если не идет загрузка
+                if loading_file == 0 and visualising == 0:  # если не идет загрузка
                     timer.update(event)
-                if start == 0:
-                    # если моделирование не запущено, то нажатые буквы выводятся на экран, записываются в text_filename
+                if loading_file == 1:
+                    # если загрузка файла запущена, то нажатые буквы выводятся на экран, записываются в text_filename
                     if event.key == pygame.K_BACKSPACE and len(text_filename) >= 1:  # стирает последний символ
                         text_filename = text_filename[:-1]
                     else:
@@ -235,7 +269,8 @@ def main():
                         text_filename = "".join(symbol for symbol in text_filename if not symbol.isdecimal())
                 if event.key == pygame.K_RETURN:  # если нажат Enter, то запускается обработка введенного текста.
                     loading_is_over = 1
-
+                if visualising == 1:
+                    number_of_planet = event.unicode
         if start == 1:  # выполняется, если моделирование запущено.
             physical_time += timer.set_time_step()
             SCREEN.fill(WHITE)
@@ -262,8 +297,8 @@ def main():
                 loading_file = 0
                 start = 1
         if visualising == 1:
-            pass
-#TODO 123123
+            SCREEN.fill(WHITE)
+            number_of_planet, visualising, start= visualising_process(objects, loaded_file, number_of_planet)
 
         for planet in objects:
             if not isinstance(planet, Star):
