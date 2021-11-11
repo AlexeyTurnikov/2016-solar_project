@@ -1,6 +1,7 @@
 # coding: utf-8
 # license: GPLv3
-
+import math
+import matplotlib.pyplot as pt
 from solar_objects import Star, Planet
 
 
@@ -106,9 +107,21 @@ def statistics(output_filename, space_objects, time):
     :param space_objects: the list of the objects parameters of which we write to the file
     :param time: time estimated for the moment when user asks for saving parameters to the file
     """
+    speed = []
+    h_coordinates = []
+    v_coordinates = []
+    time = []
     with open(output_filename, "w") as out_file:
+        needed_object = 1
+        obj_stats = 0
         for obj in space_objects:
-            print(f"{obj.type} {obj.r} {obj.color} {obj.m} {obj.x} {obj.y} {obj.vx} {obj.vy}", file=out_file)
+            if obj_stats == needed_object:
+                speed.append(math.sqrt(obj.vx ** 2 + obj.vy ** 2))
+                h_coordinates.append(obj.x)
+                v_coordinates.append(obj.y)
+                time.append(time)
+            obj_stats += 1
+        print(f" {needed_object} {time} {h_coordinates} {v_coordinates} {speed}", file=out_file)
 
 
 if __name__ == "__main__":
