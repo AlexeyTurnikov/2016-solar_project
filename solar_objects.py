@@ -2,40 +2,44 @@
 # license: GPLv3
 
 class Star:
-    """Тип данных, описывающий звезду.
-    Содержит массу, координаты, скорость звезды,
-    а также визуальный радиус звезды в пикселах и её цвет.
+    """
+    data type describing a star.
+    includes mass, coordinates, velocity of a star, visual radius of a star and its color.
     """
 
     type = "star"
-    """Признак объекта звезды"""
+    """ attribute of a star object """
 
     m = 0
-    """Масса звезды"""
+    """ star mass """
 
     x = 0
-    """Координата по оси **x**"""
+    """ x coordinate """
 
     y = 0
-    """Координата по оси **y**"""
+    """ y coordinate """
 
     vx = 0
-    """Скорость по оси **x**"""
+    """ x velocity component """
 
     vy = 0
-    """Скорость по оси **y**"""
+    """ y velocity component """
 
     fx = 0
-    """Сила по оси **x**"""
+    """ x force component """
 
     fy = 0
-    """Сила по оси **y**"""
+    """ y force component """
 
     r = 5
-    """Радиус звезды"""
+    """ radius of a star """
 
     color = "red"
-    """Цвет звезды"""
+    """ color of a star """
+
+    """
+    get functions: return one of star's parameters.
+    """
 
     def get_type(self):
         return self.type
@@ -66,6 +70,10 @@ class Star:
 
     def get_color(self):
         return self.color
+
+    """
+    set functions: set one of star's parameters.
+    """
 
     def set_type(self, style: str):
         self.type = style
@@ -99,44 +107,48 @@ class Star:
 
 
 class Planet:
-    """Тип данных, описывающий планету.
-    Содержит массу, координаты, скорость планеты,
-    а также визуальный радиус планеты в пикселах и её цвет
+    """
+    data type describing a planet.
+    includes mass, coordinates, velocity of a star, visual radius of a star and its color.
     """
 
     type = "planet"
-    """Признак объекта планеты"""
+    """ attribute of a star object """
 
     m = 0
-    """Масса планеты"""
+    """ planet mass """
 
     x = 0
-    """Координата по оси **x**"""
+    """ x coordinate """
 
     y = 0
-    """Координата по оси **y**"""
+    """ y coordinate """
 
     vx = 0
-    """Скорость по оси **x**"""
+    """ x velocity component """
 
     vy = 0
-    """Скорость по оси **y**"""
+    """ y velocity component """
 
     fx = 0
-    """Сила по оси **x**"""
+    """ x force component """
 
     fy = 0
-    """Сила по оси **y**"""
+    """ y force component """
 
     r = 5
-    """Радиус планеты"""
+    """ radius of a planet"""
 
     color = "green"
-    """Цвет планеты"""
+    """ color of a planet """
     v_massive = []
-    """Скорости планеты в различные моменты времени"""
+    """ velocities of a planet during time """
     distance_massive = []
-    """Расстояние до центра планеты в различные моменты времени"""
+    """ distance to the center of the system during time """
+
+    """
+    get functions: return one of planet's parameters.
+    """
 
     def get_type(self):
         return self.type
@@ -174,6 +186,10 @@ class Planet:
     def get_distance_massive(self):
         return self.distance_massive
 
+    """
+    set functions: set one of planet's parameters.
+    """
+
     def set_type(self, style: str):
         self.type = style
 
@@ -203,6 +219,10 @@ class Planet:
 
     def set_color(self, color: str):
         self.color = color
+
+    """
+    functions, appending to lists of velocities and coordinates current values.
+    """
 
     def append_v_massive(self, v):
         self.v_massive.append(v)

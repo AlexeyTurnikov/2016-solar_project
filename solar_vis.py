@@ -2,45 +2,44 @@
 # license: GPLv3
 import pygame
 
-pygame.init()
-"""Модуль визуализации.
-Функции, создающие гaрафические объекты и перемещающие их на экране, принимают физические координаты
 """
+visualisation module.
+functions creating graphic objects and moving them on the screen, get physical coordinates.
+"""
+
+pygame.init()
 
 header_font = pygame.font.SysFont('Arial', 16)
-"""Шрифт в заголовке"""
-
+""" font used in header"""
 window_width = 600
-"""Ширина окна"""
-
 window_height = 600
-"""Высота окна"""
 
 """
-Масштабирование экранных координат по отношению к физическим.
-Тип: float
-Мера: количество пикселей на один метр.
+adjusting screen coordinates in relation to physical coordinates. 
+type: float
+units: number of pixels per 1 meter
 """
 
 
 def calculate_scale_factor(max_distance):
-    """Вычисляет значение scale_factor по данной характерной длине"""
+    """
+    calculates scaling factor using given length.
+    :param max_distance: given length
+    :return: scaling parameter
+    """
     scaling = 0.4 * min(window_height, window_width) / max_distance
     return scaling
 
 
 def scale_coord(body, coord, scale_factor, x_or_y):
-    """Возвращает экранную координаты по координате модели.
-    Принимает вещественное число, возвращает целое число.
-    В случае выхода координаты за пределы экрана возвращает
-    координату, лежащую за пределами холста.
+    """
+    calculates screen coordinate using physical coordinate. if coordinate is out of screen, returns it as it is.
 
-    Параметры:
-    :param body: тело, для которого происходит скейл координаты.
-    :param coord: изначальная координата тела в физической СО.
-    :param scale_factor: фактор скейлинга.
-    :param x_or_y: Подана координата по х или по у? ==1 если х, ==0 если y.
-    :returns: position - позиция, на которой необходимо отобразить тело.
+    :param body: body, for which we scale coordinates
+    :param coord: initial body coordinate in physical system
+    :param scale_factor: scaling parameter
+    :param x_or_y: if there's x coordinate given, == 1. if y coordinate given, == 0
+    :returns: position where the body needs to appear
     """
     if x_or_y == 0:
         position_corrector = window_width
@@ -56,12 +55,12 @@ def scale_coord(body, coord, scale_factor, x_or_y):
 
 
 def update_object_position(space, body, max_distance):
-    """Создаёт отображаемый объект звезды.
+    """
+    creates object on screen.
 
-    Параметры:
-
-    **space** — холст для рисования.
-    **star** — объект звезды.
+    :param space: surface where we need to draw body
+    :param body: body which is needed to be drawn
+    :param max_distance: length used to calculate scaling parameter
     """
     scale_factor = calculate_scale_factor(max_distance)
     x = scale_coord(body, body.get_x(), scale_factor, 1)
@@ -72,11 +71,11 @@ def update_object_position(space, body, max_distance):
 
 
 def update_system_name(space, system_name):
-    """Создаёт на холсте текст с названием системы небесных тел.
-    Если текст уже был, обновляет его содержание.
-    Параметры:
-    **space** — холст для рисования.
-    **system_name** — название системы тел.
+    """
+    creates a text on screen with the name of the system of the bodies.
+
+    :param space: surface to draw on
+    :param system_name: the name of the system of bodies
     """
     words = header_font.render(system_name, True, (0, 0, 0))
     place = words.get_rect(center=(30, 80))
