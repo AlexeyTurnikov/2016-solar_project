@@ -49,9 +49,10 @@ def parse_object_parameters(line, obj):
         number_of_parameter += 1
         if isinstance(parameter, str) is True:
             parameter = parameter.split("E")
+
             if len(parameter) > 1:
-                parameter[0] = str(float(parameter[0]) * 10 ** float(parameter[1]))
-                parameters[number_of_parameter] = int(parameter[0])
+                new_parameter = float(parameter[0]) * 10 ** float(parameter[1])
+                parameters[number_of_parameter] = int(new_parameter)
             else:
                 parameters[number_of_parameter] = int(parameter[0])
     obj.set_r(parameters[0])
