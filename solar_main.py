@@ -8,13 +8,13 @@ import solar_input
 from solar_objects import Star
 import matplotlib.pyplot as plt
 
-HEIGHT = 800  # Высота экрана
+HEIGHT = 800  # screen height
 
-WIDTH = 600  # Ширина экрана
+WIDTH = 600  # screen width
 
-FPS = 30  # Количество кадров в секунду
+FPS = 30  # number of frames per second
 
-# Цвета
+# colors
 GREY = (128, 128, 128)
 RED = (200, 50, 100)
 WHITE = (255, 255, 200)
@@ -26,22 +26,32 @@ clock = pygame.time.Clock()
 
 class Button:
     """
-    Класс, отвечающий за кнопки, которые создаются на экране.
+    class of buttons on the screen.
     """
 
     def __init__(self, x, y, length, width, text: str, ):
+        """
+        constructor of button class.
+        :param x: horizontal coordinate of a button
+        :param y: vertical coordinate of a button
+        :param length: length of a button
+        :param width: width of a button
+        :param text: text displayed on a button
+        """
         self.x = x
         self.y = y
         self.length = length
         self.width = width
         self.text = text
         self.color = GREY
-        self.pressed = False  # Нажата ли кнопка?
-        self.timer = 0  # время, прошедшее с нажатия на кнопку, кнопка горит 1 секунду после нажатия.
+        self.pressed = False
+        self.timer = 0
 
     def draw(self):
-        """Функция, отвечающая за отрисовку кнопки на экране."""
-        if self.pressed is True:  # Нажатая кнопка загорается красным
+        """
+        function drawing the button on a screen.
+        """
+        if self.pressed is True:  # pressed button turns red
             self.color = RED
         else:
             self.color = GREY
@@ -55,7 +65,7 @@ class Button:
 
     def is_button_pressed(self, event):
         """
-        Функция, проверяющая нажата ли кнопка.
+        checks if button is pressed.
         """
         if self.x < event.pos[0] < self.x + self.length and self.y < event.pos[1] < self.y + self.width:
             self.pressed = True
@@ -64,20 +74,27 @@ class Button:
 
 class Timer(Button):
     """
-    Подкласс Button, отличается наличием функции ввода времени.
+    inherit button class with feature of inserting time.
     """
 
     def __init__(self, x, y, length, width, text: str):
+        """
+        constructor of timer class. parameters are identical to button's.
+        """
         super().__init__(x, y, length, width, text)
         self.time = "1"
 
     def draw(self):
+        """
+        draws a timer button with step of time on it.
+        """
         super().draw()
         writing(self.time, self.x + self.length / 2, self.y + 2 * self.width / 3)
 
     def update(self, event):
         """
-        Функция, отвечающая за ввод времени с клавиатуры, на вход принимаются только цифры.
+        function, checking what number does the user prints on the keyboard and updating the text wrote on the timer
+        button.
         """
         if event.key == pygame.K_BACKSPACE and len(self.time) >= 1:
             self.time = self.time[:-1]
@@ -87,8 +104,8 @@ class Timer(Button):
 
     def set_time_step(self):
         """
-        Функция, которая возвращает время введенное с клавиатуры.
-        Возвращает шаг времени в физическом моделировании.
+        returns the time step printed on the keyboard.
+        :return: step of time
         """
         if len(self.time) >= 1:
             time_step = int(self.time)
@@ -99,7 +116,7 @@ class Timer(Button):
 
 def calculating_max_distance(objects):
     """
-    Функция, отвечающая за рассчет максимального расстояния между телами.
+    calculates the max distance between two objects.
     """
     distances = []
     for obj in objects:
@@ -108,11 +125,12 @@ def calculating_max_distance(objects):
 
 
 def writing(text: str, xcenter, ycenter, font_size=16):
-    """Функция, отвечающая за вывод текста на экран
-    :param text: текст, который будет выведен на экран
-    :param xcenter: x координата центра
-    :param ycenter: y координата центра
-    :param font_size: размер шрифта, стандартный шрифт Arial
+    """
+    writes text on screen
+    :param text: text to appear on screen
+    :param xcenter: x coordinate of center
+    :param ycenter: y coordinate of center
+    :param font_size: size of the font, which is standart Arial
     """
     font = pygame.font.SysFont('Arial', font_size)
     words = font.render(text, True, (0, 0, 0))
@@ -122,15 +140,14 @@ def writing(text: str, xcenter, ycenter, font_size=16):
 
 def statecheck(starting, pausing, loading, visualise, start, loading_file, visualising):
     """
-    Проверяет, на какую из кнопок нажал пользователь.
-    :param starting: кнопка, отвечающая за начало моделирования
-    :param pausing: кнопка, отвечающая за приостановку моделирования
-    :param loading: кнопка, отвечающая за загрузку нового файла
-    :param visualise: кнопка, отвечающая за отображение графиков
-    :param start: параметр, отвечающий за то началось ли моделирование
-    :param loading_file: параметр, отвечающий за то началась ли загрузка нового файла
-    :param visualising: параметр, отвечающий за то началась ли отрисовка графика
-
+    checks which button is pressed by user.
+    :param starting: button for the start of modelling
+    :param pausing: button for the modelling to pause
+    :param loading: button for loading a new file
+    :param visualise: button for displaying the graphics
+    :param start: parameter using to get info if modelling has started
+    :param loading_file: parameter using to get info if loading of a new file has started
+    :param visualising: parameter using to get info if graphic was started drawing
     """
     if starting.pressed is True:
         start = 1
@@ -153,9 +170,10 @@ def statecheck(starting, pausing, loading, visualise, start, loading_file, visua
 
 def save_planet_parameters(planet, physical_time):
     """
-    Функция, которая сохраняет каждые 500000 лет данные о скорости и расстоянии до звезды у тела.
-    :param planet: планета, для которой необходимо сохранить данные.
-    :param physical_time: физическое время, прошедшее с начала моделирования.
+    function which saves data about the velocity and distance to star of an object every 50000 years.
+
+    :param planet: planet for which we save data
+    :param physical_time: physical time after the start of modelling
     """
     i = 1
     if physical_time - i * 500000 > 0:
@@ -166,9 +184,10 @@ def save_planet_parameters(planet, physical_time):
 
 def painting_graphics(planet):
     """
-    Функция, отвечающая за работу с массивом скоростей, расстояний до звезды, отрисовку графиков.
-    График рисуется по последним 100 точкам. Если точек меньше 100, то по всем точкам.
-    :param planet: планета, для которой необходимо нарисовать графики
+    function working with lists of velocities and coordinates and drawing graphics. Graph is drawn using the last 100
+    positions (or less).
+
+    :param planet: planet, for which we draw graphics
     """
     velocity = planet.get_v_massive()
     while len(velocity) > 100:
@@ -207,23 +226,24 @@ def painting_graphics(planet):
 
 def visualising_process(objects, loaded_file, number_of_planet):
     """
-    Функция, отвечающая за меню выбора планеты, для которой необходимо построить график.
-    Также запускает отрисовку самого графика
-    :param objects: массив со всеми телами в модели.
-    :param loaded_file: файл, который сейчас моделируется.
-    :param number_of_planet: номер планеты, для которой пользователь хочет увидеть графики.
+    function responsible for a menu of the choice of a planet for which user wants to create graphic. starts the
+    drawing of it.
+
+    :param objects: list with all the objects in a model
+    :param loaded_file: file which is currently modelling
+    :param number_of_planet: number of a planet for which user wants to get graphic
     :returns: number_of_planet, visualising, start
     """
     visualising = 1
     start = 0
     names = ["Mercury", "Venus", "Earth", "Mars", "Jupyter", "Saturn", "Uranus", "Neptune"]
-    writing("Введите номер выбранной планеты", 300, 100)
+    writing("Enter the number of a chosen planet: ", 300, 100)
     if loaded_file == "solar_system.txt":
         for i in range(0, len(objects) - 1):
             writing(names[i] + " [ " + str(i) + " ] ", 300, 125 + i * 25)
     if loaded_file == "double_star.txt":
-        writing("Ни один из обьектов", 300, 125)
-        writing("не является планетой", 300, 150)
+        writing("None of the objects", 300, 125)
+        writing("is a planet", 300, 150)
         if number_of_planet is not False:
             number_of_planet = False
             visualising = 0
@@ -232,7 +252,7 @@ def visualising_process(objects, loaded_file, number_of_planet):
         writing("planet [0]", 300, 125)
     if (not str(number_of_planet).isdecimal() or str(number_of_planet).isdecimal() and int(number_of_planet) > len(
             objects) - 2) and number_of_planet is not False:
-        writing("Введите другой номер", 300, 350, 32)
+        writing("Enter another number: ", 300, 350, 32)
 
     elif number_of_planet is not None and number_of_planet is not False:
         painting_graphics(objects[int(number_of_planet) + 1])
@@ -245,24 +265,24 @@ def visualising_process(objects, loaded_file, number_of_planet):
 
 def loading_process(objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over):
     """
-    Функция, отвечающая за загрузку нового файла.
-    :param objects: обьекты моделируемой системы.
-    :param loaded_file: файл, который загружен в данный момент.
-    :param max_distance: максимальное расстояние между планетой и звездой.
-    :param text_filename: название файла, которое необходимо загрузить. Вводится с клавиатуры.
-    :param physical_time: физическое время, прошедшее с начала моделирования
-    :param loading_is_over: == 1, если пользователь ввел название нового файла; == 0, когда введенные данные обработаны.
-    :returns:  objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over, loading_file, start.
+    responses for a new file loading.
+    :param objects: objects of a modelling system
+    :param loaded_file: file which is loaded at this particular moment
+    :param max_distance: maximal distance between planet and a star
+    :param text_filename: name of file which need to be loaded. gets from a keyboard
+    :param physical_time: physical time after the start of modelling
+    :param loading_is_over: == 1, if user entered the name of a new file; == 0, if the entered data is processed
+    :returns:  objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over, loading_file, start
     """
 
     start = 0
     loading_file = 1
-    writing("Выберите файл для моделирования из доступных:", 300, 100, 24)
+    writing("Choose a file for modelling:", 300, 100, 24)
     writing("one_satellite.txt", 300, 150, 32)
     writing("solar_system.txt", 300, 200, 32)
     writing("double_star.txt", 300, 250, 32)
     writing(text_filename, 300, 350, 64)
-    if loading_is_over == 1:  # запускается после того, как пользователь ввел название нового файла
+    if loading_is_over == 1:  # starts after a user entered the name of a file
         splitted_text_filename = text_filename.rsplit()
         objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))
         loaded_file = splitted_text_filename[0]
@@ -277,17 +297,17 @@ def loading_process(objects, loaded_file, max_distance, text_filename, physical_
 
 def main():
     """
-    Главная функция главного модуля. Отвечает за всё.
+    main function of the main module.
     """
     pygame.init()
-    loaded_file = "one_satellite.txt"  # Файл, который будет загружен изначально.
-    physical_time = 0  # Физическое время, прошедшее со старта моделирования.
-    start = 0  # == 1, если моделирование запущено; == 0, если моделирование остановлено;
-    loading_file = 0  # == 1, если нажата кнопка load file; == 0, если пользователь ввел новый файл и  нажал Enter.
-    loading_is_over = 0  # == 1, если пользователь ввел название нового файла; == 0, когда введенные данные обработаны.
-    text_filename = "_"  # переменная, в которой хранится введенный текст для смены файла.
-    visualising = 0  # == 1, если нажата кнопка graphics; ==0, если пользователь выбрал обьект для постройки графика.
-    number_of_planet = False  # номер планеты, для которой необходимо вывести график
+    loaded_file = "one_satellite.txt"  # initial loaded file;
+    physical_time = 0  # physical time after the start of modelling;
+    start = 0  # == 1, if modelling is running; == 0, if modelling is paused;
+    loading_file = 0  # == 1, if load file button is pressed; == 0, if a user printed another file and pressed Enter;
+    loading_is_over = 0  # == 1, if the user printed a new file name; == 0, when input data is processed;
+    text_filename = "_"  # variable with printed text for the change of a file;
+    visualising = 0  # == 1, if graphics button is pressed; ==0, if user had chosen the object to build a graph;
+    number_of_planet = False  # number of planet, for which we need to build a graphic.
 
     finished = False
 
@@ -298,7 +318,7 @@ def main():
     save_file_button = Button(450, 600, 150, 100, "save_file")
     graphic_button = Button(450, 700, 150, 100, "Graphics")
     buttons = [start_button, pause_button, load_from_file_button, save_file_button,
-               graphic_button]  # массив с нажимаемыми кнопками.
+               graphic_button]  # list with possibly pressed buttons
     objects = solar_input.read_space_objects_data_from_file(loaded_file)
 
     max_distance = calculating_max_distance(objects)
@@ -306,14 +326,14 @@ def main():
     SCREEN.fill(WHITE)
     print('Modelling started!')
 
-    while not finished:  # главный цикл главного модуля
+    while not finished:  # the main cycle of the main module
         clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
 
             if event.type == pygame.MOUSEBUTTONUP:
-                for button in buttons:  # Проверяет на какую кнопку нажал пользователь
+                for button in buttons:  # checks which button is pressed
                     button.is_button_pressed(event)
                 start, loading_file, visualising = statecheck(start_button, pause_button, load_from_file_button,
                                                               graphic_button, start, loading_file, visualising)
@@ -321,24 +341,25 @@ def main():
                     solar_input.statistics("stats.txt", objects, physical_time)
 
             if event.type == pygame.KEYDOWN:
-                if loading_file == 0 and visualising == 0:  # если не идет загрузка
+                if loading_file == 0 and visualising == 0:  # if loading is not in process
                     timer.update(event)
 
                 if loading_file == 1:
-                    # если загрузка файла запущена, то нажатые буквы выводятся на экран, записываются в text_filename
+                    # if the loading has started, pressed symbols are appearing on the screen and are written to the
+                    # filename text
                     if event.key == pygame.K_BACKSPACE and len(text_filename) >= 1:  # стирает последний символ
                         text_filename = text_filename[:-1]
                     else:
                         text_filename += event.unicode
                         text_filename = "".join(symbol for symbol in text_filename if not symbol.isdecimal())
 
-                if event.key == pygame.K_RETURN:  # если нажат Enter, то запускается обработка введенного текста.
+                if event.key == pygame.K_RETURN:  # if Enter is pressed, processing the entered text starts
                     loading_is_over = 1
 
                 if visualising == 1:
                     number_of_planet = event.unicode
 
-        if start == 1:  # выполняется, если моделирование запущено.
+        if start == 1:  # if modelling is started
             physical_time += timer.set_time_step()
             SCREEN.fill(WHITE)
             writing(str(physical_time), 50, 50)
@@ -346,7 +367,7 @@ def main():
                 model.recalculate_space_objects_positions(objects, timer.set_time_step())
                 vis.update_object_position(SCREEN, obj, max_distance)
 
-        if loading_file == 1:  # выполняется после нажатия на кнопку load file
+        if loading_file == 1:  # if button load file is pressed
             SCREEN.fill(WHITE)
             objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over, loading_file, start = \
                 loading_process(objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over)
