@@ -24,96 +24,6 @@ SCREEN = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
 
-class Button:
-    """
-    class of buttons on the screen.
-    """
-
-    def __init__(self, x, y, length, width, text: str, ):
-        """
-        constructor of button class.
-        :param x: horizontal coordinate of a button
-        :param y: vertical coordinate of a button
-        :param length: length of a button
-        :param width: width of a button
-        :param text: text displayed on a button
-        """
-        self.x = x
-        self.y = y
-        self.length = length
-        self.width = width
-        self.text = text
-        self.color = GREY
-        self.pressed = False
-        self.timer = 0
-
-    def draw(self):
-        """
-        function drawing the button on a screen.
-        """
-        if self.pressed is True:  # pressed button turns red
-            self.color = RED
-        else:
-            self.color = GREY
-        pygame.draw.rect(SCREEN, self.color, (self.x, self.y, self.length, self.width))
-        pygame.draw.rect(SCREEN, BLACK, (self.x, self.y, self.length, self.width), 1)
-        writing(self.text, self.x + self.length / 2, self.y + self.width / 2)
-        if self.timer > 0:
-            self.timer += 1
-        if self.timer % 30 == 0:
-            self.pressed = False
-
-    def is_button_pressed(self, event):
-        """
-        checks if button is pressed.
-        """
-        if self.x < event.pos[0] < self.x + self.length and self.y < event.pos[1] < self.y + self.width:
-            self.pressed = True
-            self.timer = 1
-
-
-class Timer(Button):
-    """
-    inherit button class with feature of inserting time.
-    """
-
-    def __init__(self, x, y, length, width, text: str):
-        """
-        constructor of timer class. parameters are identical to button's.
-        """
-        super().__init__(x, y, length, width, text)
-        self.time = "1"
-
-    def draw(self):
-        """
-        draws a timer button with step of time on it.
-        """
-        super().draw()
-        writing(self.time, self.x + self.length / 2, self.y + 2 * self.width / 3)
-
-    def update(self, event):
-        """
-        function, checking what number does the user prints on the keyboard and updating the text wrote on the timer
-        button.
-        """
-        if event.key == pygame.K_BACKSPACE and len(self.time) >= 1:
-            self.time = self.time[:-1]
-        elif len(self.time) <= 10:
-            self.time += event.unicode
-            self.time = "".join(symbol for symbol in self.time if symbol.isdecimal())  # проверяет введена ли цифра
-
-    def set_time_step(self):
-        """
-        returns the time step printed on the keyboard.
-        :return: step of time
-        """
-        if len(self.time) >= 1:
-            time_step = int(self.time)
-        else:
-            time_step = 1
-        return time_step
-
-
 def calculating_max_distance(objects):
     """
     calculates the max distance between two objects.
@@ -293,6 +203,96 @@ def loading_process(objects, loaded_file, max_distance, text_filename, physical_
         loading_file = 0
         start = 1
     return objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over, loading_file, start
+
+
+class Button:
+    """
+    class of buttons on the screen.
+    """
+
+    def __init__(self, x, y, length, width, text: str, ):
+        """
+        constructor of button class.
+        :param x: horizontal coordinate of a button
+        :param y: vertical coordinate of a button
+        :param length: length of a button
+        :param width: width of a button
+        :param text: text displayed on a button
+        """
+        self.x = x
+        self.y = y
+        self.length = length
+        self.width = width
+        self.text = text
+        self.color = GREY
+        self.pressed = False
+        self.timer = 0
+
+    def draw(self):
+        """
+        function drawing the button on a screen.
+        """
+        if self.pressed is True:  # pressed button turns red
+            self.color = RED
+        else:
+            self.color = GREY
+        pygame.draw.rect(SCREEN, self.color, (self.x, self.y, self.length, self.width))
+        pygame.draw.rect(SCREEN, BLACK, (self.x, self.y, self.length, self.width), 1)
+        writing(self.text, self.x + self.length / 2, self.y + self.width / 2)
+        if self.timer > 0:
+            self.timer += 1
+        if self.timer % 30 == 0:
+            self.pressed = False
+
+    def is_button_pressed(self, event):
+        """
+        checks if button is pressed.
+        """
+        if self.x < event.pos[0] < self.x + self.length and self.y < event.pos[1] < self.y + self.width:
+            self.pressed = True
+            self.timer = 1
+
+
+class Timer(Button):
+    """
+    inherit button class with feature of inserting time.
+    """
+
+    def __init__(self, x, y, length, width, text: str):
+        """
+        constructor of timer class. parameters are identical to button's.
+        """
+        super().__init__(x, y, length, width, text)
+        self.time = "1"
+
+    def draw(self):
+        """
+        draws a timer button with step of time on it.
+        """
+        super().draw()
+        writing(self.time, self.x + self.length / 2, self.y + 2 * self.width / 3)
+
+    def update(self, event):
+        """
+        function, checking what number does the user prints on the keyboard and updating the text wrote on the timer
+        button.
+        """
+        if event.key == pygame.K_BACKSPACE and len(self.time) >= 1:
+            self.time = self.time[:-1]
+        elif len(self.time) <= 10:
+            self.time += event.unicode
+            self.time = "".join(symbol for symbol in self.time if symbol.isdecimal())  # проверяет введена ли цифра
+
+    def set_time_step(self):
+        """
+        returns the time step printed on the keyboard.
+        :return: step of time
+        """
+        if len(self.time) >= 1:
+            time_step = int(self.time)
+        else:
+            time_step = 1
+        return time_step
 
 
 def main():
