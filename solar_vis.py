@@ -4,7 +4,6 @@ import pygame
 
 pygame.init()
 """Модуль визуализации.
-Нигде, кроме этого модуля, не используются экранные координаты объектов.
 Функции, создающие гaрафические объекты и перемещающие их на экране, принимают физические координаты
 """
 
@@ -30,42 +29,29 @@ def calculate_scale_factor(max_distance):
     return scaling
 
 
-def scale_x(body, x, scale_factor):
-    """Возвращает экранную **x** координату по **x** координате модели.
+def scale_coord(body, coord, scale_factor, x_or_y):
+    """Возвращает экранную координаты по координате модели.
     Принимает вещественное число, возвращает целое число.
-    В случае выхода **x** координаты за пределы экрана возвращает
+    В случае выхода координаты за пределы экрана возвращает
     координату, лежащую за пределами холста.
 
     Параметры:
-
-    **x** — x-координата модели.
+    :param body: тело, для которого происходит скейл координаты.
+    :param coord: изначальная координата тела в физической СО.
+    :param scale_factor: фактор скейлинга.
+    :param x_or_y: Подана координата по х или по у? ==1 если х, ==0 если y.
+    :returns: position - позиция, на которой необходимо отобразить тело.
     """
+    if x_or_y == 0:
+        position_corrector = window_width
+    else:
+        position_corrector = window_height
     r = body.get_r()
-    position = - int(x * scale_factor) + window_width // 2
-    if position >= window_width - r:
-        position = window_width - r
+    position = - int(coord * scale_factor) + position_corrector // 2
+    if position >= position_corrector - r:
+        position = position_corrector + r
     if position <= r:
-        position = r
-    return position
-
-
-def scale_y(body, y, scale_factor):
-    """Возвращает экранную **y** координату по **y** координате модели.
-    Принимает вещественное число, возвращает целое число.
-    В случае выхода **y** координаты за пределы экрана возвращает
-    координату, лежащую за пределами холста.
-    Направление оси развёрнуто, чтобы у модели ось **y** смотрела вверх.
-
-    Параметры:
-
-    **y** — y-координата модели.
-    """
-    r = body.get_r()
-    position = - int(y * scale_factor) + window_height // 2
-    if position >= window_height - r:
-        position = window_height - r
-    if position <= r:
-        position = r
+        position = -2 * r
     return position
 
 
@@ -78,8 +64,8 @@ def update_object_position(space, body, max_distance):
     **star** — объект звезды.
     """
     scale_factor = calculate_scale_factor(max_distance)
-    x = scale_x(body, body.get_x(), scale_factor)
-    y = scale_y(body, body.get_y(), scale_factor)
+    x = scale_coord(body, body.get_x(), scale_factor, 1)
+    y = scale_coord(body, body.get_y(), scale_factor, 0)
     r = body.get_r()
     color = body.get_color()
     pygame.draw.circle(space, color, (x, y), r)

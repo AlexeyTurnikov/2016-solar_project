@@ -212,6 +212,7 @@ def visualising_process(objects, loaded_file, number_of_planet):
     :param objects: массив со всеми телами в модели.
     :param loaded_file: файл, который сейчас моделируется.
     :param number_of_planet: номер планеты, для которой пользователь хочет увидеть графики.
+    :returns: number_of_planet, visualising, start
     """
     visualising = 1
     start = 0
@@ -240,6 +241,38 @@ def visualising_process(objects, loaded_file, number_of_planet):
         start = 1
 
     return number_of_planet, visualising, start
+
+
+def loading_process(objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over):
+    """
+    Функция, отвечающая за загрузку нового файла.
+    :param objects: обьекты моделируемой системы.
+    :param loaded_file: файл, который загружен в данный момент.
+    :param max_distance: максимальное расстояние между планетой и звездой.
+    :param text_filename: название файла, которое необходимо загрузить. Вводится с клавиатуры.
+    :param physical_time: физическое время, прошедшее с начала моделирования
+    :param loading_is_over: == 1, если пользователь ввел название нового файла; == 0, когда введенные данные обработаны.
+    :returns:  objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over, loading_file, start.
+    """
+
+    start = 0
+    loading_file = 1
+    writing("Выберите файл для моделирования из доступных:", 300, 100, 24)
+    writing("one_satellite.txt", 300, 150, 32)
+    writing("solar_system.txt", 300, 200, 32)
+    writing("double_star.txt", 300, 250, 32)
+    writing(text_filename, 300, 350, 64)
+    if loading_is_over == 1:  # запускается после того, как пользователь ввел название нового файла
+        splitted_text_filename = text_filename.rsplit()
+        objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))
+        loaded_file = splitted_text_filename[0]
+        max_distance = calculating_max_distance(objects)
+        text_filename = "_"
+        physical_time = 0
+        loading_is_over = 0
+        loading_file = 0
+        start = 1
+    return objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over, loading_file, start
 
 
 def main():
@@ -278,6 +311,7 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finished = True
+
             if event.type == pygame.MOUSEBUTTONUP:
                 for button in buttons:  # Проверяет на какую кнопку нажал пользователь
                     button.is_button_pressed(event)
@@ -285,9 +319,11 @@ def main():
                                                               graphic_button, start, loading_file, visualising)
                 if save_file_button.pressed is True:
                     solar_input.statistics("stats.txt", objects, physical_time)
+
             if event.type == pygame.KEYDOWN:
                 if loading_file == 0 and visualising == 0:  # если не идет загрузка
                     timer.update(event)
+
                 if loading_file == 1:
                     # если загрузка файла запущена, то нажатые буквы выводятся на экран, записываются в text_filename
                     if event.key == pygame.K_BACKSPACE and len(text_filename) >= 1:  # стирает последний символ
@@ -295,10 +331,13 @@ def main():
                     else:
                         text_filename += event.unicode
                         text_filename = "".join(symbol for symbol in text_filename if not symbol.isdecimal())
+
                 if event.key == pygame.K_RETURN:  # если нажат Enter, то запускается обработка введенного текста.
                     loading_is_over = 1
+
                 if visualising == 1:
                     number_of_planet = event.unicode
+
         if start == 1:  # выполняется, если моделирование запущено.
             physical_time += timer.set_time_step()
             SCREEN.fill(WHITE)
@@ -309,21 +348,9 @@ def main():
 
         if loading_file == 1:  # выполняется после нажатия на кнопку load file
             SCREEN.fill(WHITE)
-            writing("Выберите файл для моделирования из доступных:", 300, 100, 24)
-            writing("one_satellite.txt", 300, 150, 32)
-            writing("solar_system.txt", 300, 200, 32)
-            writing("double_star.txt", 300, 250, 32)
-            writing(text_filename, 300, 350, 64)
-            if loading_is_over == 1:  # запускается после того, как пользователь ввел название нового файла
-                splitted_text_filename = text_filename.rsplit()
-                objects = solar_input.read_space_objects_data_from_file(str(splitted_text_filename[0]))
-                loaded_file = splitted_text_filename[0]
-                max_distance = calculating_max_distance(objects)
-                text_filename = "_"
-                physical_time = 0
-                loading_is_over = 0
-                loading_file = 0
-                start = 1
+            objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over, loading_file, start = \
+                loading_process(objects, loaded_file, max_distance, text_filename, physical_time, loading_is_over)
+
         if visualising == 1:
             SCREEN.fill(WHITE)
             number_of_planet, visualising, start = visualising_process(objects, loaded_file, number_of_planet)
