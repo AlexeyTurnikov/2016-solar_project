@@ -17,7 +17,6 @@ window_width = 600
 window_height = 600
 """Высота окна"""
 
-
 """
 Масштабирование экранных координат по отношению к физическим.
 Тип: float
@@ -96,9 +95,6 @@ def update_system_name(space, system_name):
     words = header_font.render(system_name, True, (0, 0, 0))
     place = words.get_rect(center=(30, 80))
     space.blit(words, place)
-
-
-
 
 
 if __name__ == "__main__":

@@ -126,8 +126,11 @@ def statecheck(starting, pausing, loading, visualise, start, loading_file, visua
     :param starting: кнопка, отвечающая за начало моделирования
     :param pausing: кнопка, отвечающая за приостановку моделирования
     :param loading: кнопка, отвечающая за загрузку нового файла
+    :param visualise: кнопка, отвечающая за отображение графиков
     :param start: параметр, отвечающий за то началось ли моделирование
     :param loading_file: параметр, отвечающий за то началась ли загрузка нового файла
+    :param visualising: параметр, отвечающий за то началась ли отрисовка графика
+
     """
     if starting.pressed is True:
         start = 1
@@ -149,6 +152,11 @@ def statecheck(starting, pausing, loading, visualise, start, loading_file, visua
 
 
 def save_planet_parameters(planet, physical_time):
+    """
+    Функция, которая сохраняет каждые 500000 лет данные о скорости и расстоянии до звезды у тела.
+    :param planet: планета, для которой необходимо сохранить данные.
+    :param physical_time: физическое время, прошедшее с начала моделирования.
+    """
     i = 1
     if physical_time - i * 500000 > 0:
         planet.append_v_massive((planet.get_vx() ** 2 + planet.get_vy() ** 2) ** 0.5)
@@ -157,24 +165,38 @@ def save_planet_parameters(planet, physical_time):
 
 
 def painting_graphics(planet):
+    """
+    Функция, отвечающая за работу с массивом скоростей, расстояний до звезды, отрисовку графиков.
+    График рисуется по последним 100 точкам. Если точек меньше 100, то по всем точкам.
+    :param planet: планета, для которой необходимо нарисовать графики
+    """
     velocity = planet.get_v_massive()
+    while len(velocity) > 100:
+        velocity.pop(0)
     distance = planet.get_distance_massive()
+    while len(distance) > 100:
+        distance.pop(0)
     time = []
-    for timer in range(0, 500000 * len(velocity), 500000):
+    if len(velocity) < 100:
+        steps = len(velocity)
+    else:
+        steps = 100
+    for timer in range(0, 300000 * steps, 300000):
         time.append(timer)
-    plt.subplot(221)
+    plt.figure(figsize=(20, 10))
+    plt.subplot(131)
     plt.plot(time, velocity)
     plt.title('$Velocity$')
-    plt.xlabel("time, years")
+    plt.xlabel("time, years", )
     plt.ylabel("velocity, km/years")
     plt.grid(True)
-    plt.subplot(222)
+    plt.subplot(132)
     plt.plot(time, distance)
     plt.title(r'$Distance to planet$')
     plt.xlabel("time, years")
     plt.ylabel("distance, km")
     plt.grid(True)
-    plt.subplot(223)
+    plt.subplot(133)
     plt.plot(distance, velocity)
     plt.title(r'$Distance/Velocity$,')
     plt.xlabel("distance, km")
@@ -184,9 +206,15 @@ def painting_graphics(planet):
 
 
 def visualising_process(objects, loaded_file, number_of_planet):
+    """
+    Функция, отвечающая за меню выбора планеты, для которой необходимо построить график.
+    Также запускает отрисовку самого графика
+    :param objects: массив со всеми телами в модели.
+    :param loaded_file: файл, который сейчас моделируется.
+    :param number_of_planet: номер планеты, для которой пользователь хочет увидеть графики.
+    """
     visualising = 1
     start = 0
-    print(number_of_planet)
     names = ["Mercury", "Venus", "Earth", "Mars", "Jupyter", "Saturn", "Uranus", "Neptune"]
     writing("Введите номер выбранной планеты", 300, 100)
     if loaded_file == "solar_system.txt":
@@ -195,15 +223,14 @@ def visualising_process(objects, loaded_file, number_of_planet):
     if loaded_file == "double_star.txt":
         writing("Ни один из обьектов", 300, 125)
         writing("не является планетой", 300, 150)
-        if number_of_planet is not False and number_of_planet is not None:
+        if number_of_planet is not False:
             number_of_planet = False
             visualising = 0
             start = 1
     if loaded_file == "one_satellite.txt":
         writing("planet [0]", 300, 125)
-    if (not str(number_of_planet).isdecimal() or str(
-            number_of_planet).isdecimal() and int(number_of_planet) > len(
-        objects) - 2) and number_of_planet is not None and number_of_planet is not False:
+    if (not str(number_of_planet).isdecimal() or str(number_of_planet).isdecimal() and int(number_of_planet) > len(
+            objects) - 2) and number_of_planet is not False:
         writing("Введите другой номер", 300, 350, 32)
 
     elif number_of_planet is not None and number_of_planet is not False:
@@ -228,6 +255,7 @@ def main():
     text_filename = "_"  # переменная, в которой хранится введенный текст для смены файла.
     visualising = 0  # == 1, если нажата кнопка graphics; ==0, если пользователь выбрал обьект для постройки графика.
     number_of_planet = False  # номер планеты, для которой необходимо вывести график
+
     finished = False
 
     start_button = Button(0, 600, 100, 100, "start")
@@ -298,7 +326,7 @@ def main():
                 start = 1
         if visualising == 1:
             SCREEN.fill(WHITE)
-            number_of_planet, visualising, start= visualising_process(objects, loaded_file, number_of_planet)
+            number_of_planet, visualising, start = visualising_process(objects, loaded_file, number_of_planet)
 
         for planet in objects:
             if not isinstance(planet, Star):
