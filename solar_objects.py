@@ -1,6 +1,5 @@
 # coding: utf-8
 # license: GPLv3
-# В процессе
 
 class Star:
     """Тип данных, описывающий звезду.
